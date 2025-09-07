@@ -245,7 +245,7 @@ fi
 
 # Unduh file konfigurasi HAProxy
 echo "Mengunduh file konfigurasi HAProxy..."
-wget -O /etc/haproxy/haproxy.cfg "https://v4.serverpremium.web.id:81/os/install/haproxy.cfg"
+wget -O /etc/haproxy/haproxy.cfg "https://raw.githubusercontent.com/kingstorevpn/os/main/install/haproxy.cfg"
 
 # Reload daemon systemd
 echo "Memuat ulang daemon systemd..."
@@ -306,7 +306,7 @@ echo; echo -n 'Creating cron to run script every minute.....(Default setting)'
 echo '.....done'
 echo; echo 'Installation has completed.'
 echo 'Config file is at /usr/local/ddos/ddos.conf'
-echo 'Please send in your comments and/or suggestions to https://t.me/newbie_store24'
+echo 'Please send in your comments and/or suggestions to https://t.me/candravpnz'
 
 # banner /etc/issue.net
 echo "Banner /etc/issue.net" >>/etc/ssh/sshd_config
