@@ -105,21 +105,21 @@ function key2(){
         USERGIT=$(cat /etc/github/username)
         hhari=$(date -d "1 days" +"%Y-%m-%d")
         cd
-        git clone https://github.com/myridwan/izinvps >/dev/null 2>&1
-		cd izinvps
-        echo "### $author $hhari $MYIP @trial" >> ipx
+        git clone https://github.com/kingstorevpn/ip >/dev/null 2>&1
+		cd ip
+        echo "### $author $hhari $MYIP @trial" >> ip
         sleep 1
         git config --global user.email "${EMAILGIT}" >/dev/null 2>&1
         git config --global user.name "${USERGIT}" >/dev/null 2>&1
         git init >/dev/null 2>&1
-        git add ipx
+        git add ip
         git commit -m register >/dev/null 2>&1
-        git branch -M ipuk >/dev/null 2>&1
-        git remote add origin https://github.com/${USERGIT}/izinvps >/dev/null 2>&1
-        git push -f https://${APIGIT}@github.com/${USERGIT}/izinvps >/dev/null 2>&1
+        git branch -M ip >/dev/null 2>&1
+        git remote add origin https://github.com/${USERGIT}/ip >/dev/null 2>&1
+        git push -f https://${APIGIT}@github.com/${USERGIT}/ip >/dev/null 2>&1
         sleep 1
         cd
-        rm -rf /root/izinvps
+        rm -rf /root/ip
         clear
     fi
 
@@ -151,24 +151,24 @@ USERGIT=$(cat /etc/github/username)
 hhari=$(date -d "30 days" +"%Y-%m-%d")
 
 cd
-git clone https://github.com/myridwan/izinvps >/dev/null 2>&1
-cd izinvps
-echo "### $author $hhari $MYIP @VIP" >> ipx
-sed -i "/# SSHWS/a ### ${author} ${hhari} ${MYIP} ON SSHWS @VIP" /root/izinvps/ip
+git clone https://github.com/kingstorevpn/ip >/dev/null 2>&1
+cd ip
+echo "### $author $hhari $MYIP @VIP" >> ip
+sed -i "/# SSHWS/a ### ${author} ${hhari} ${MYIP} ON SSHWS @VIP" /root/ip/ip
 sleep 0.5
 
 git config --global user.email "${EMAILGIT}" >/dev/null 2>&1
 git config --global user.name "${USERGIT}" >/dev/null 2>&1
 git init >/dev/null 2>&1
-git add ipx 
+git add ip 
 git add ip
 git commit -m register >/dev/null 2>&1
-git branch -M ipuk >/dev/null 2>&1
-git remote add origin https://github.com/${USERGIT}/izinvps >/dev/null 2>&1
-git push -f https://${APIGIT}@github.com/${USERGIT}/izinvps >/dev/null 2>&1
+git branch -M main >/dev/null 2>&1
+git remote add origin https://github.com/${USERGIT}/ip >/dev/null 2>&1
+git push -f https://${APIGIT}@github.com/${USERGIT}/ip >/dev/null 2>&1
 sleep 0.5
 cd
-rm -rf /root/izinvps
+rm -rf /root/ip
 elif [[ $kode == "XLVIP" ]]; then
 MYIP2=$(curl -sS ipv4.icanhazip.com)
 author2=$(cat /etc/xray/username)
@@ -185,22 +185,22 @@ USERGIT=$(cat /etc/github/username)
 hhari2=$(date -d "999 days" +"%Y-%m-%d")
 
 cd
-git clone https://github.com/myridwan/izinvps >/dev/null 2>&1
+git clone https://github.com/kingstorevpn/ip >/dev/null 2>&1
 cd izinvps
-sed -i "/# VIP/a ### ${author} ${hhari2} ${MYIP2} ON 10 @VIP" /root/izinvps/ipx
-sed -i "/# SSHWS/a ### ${author} ${hhari2} ${MYIP2} ON SSHWS @VIP" /root/izinvps/ip
+sed -i "/# VIP/a ### ${author} ${hhari2} ${MYIP2} ON 10 @VIP" /root/ip/ip
+sed -i "/# SSHWS/a ### ${author} ${hhari2} ${MYIP2} ON SSHWS @VIP" /root/ip/ip
 
 sleep 0.5
 
 git config --global user.email "${EMAILGIT}" >/dev/null 2>&1
 git config --global user.name "${USERGIT}" >/dev/null 2>&1
 git init >/dev/null 2>&1
-git add ipx
+git add ip
 git add ip
 git commit -m register >/dev/null 2>&1
-git branch -M ipuk >/dev/null 2>&1
-git remote add origin https://github.com/${USERGIT}/izinvps >/dev/null 2>&1
-git push -f https://${APIGIT}@github.com/${USERGIT}/izinvps >/dev/null 2>&1
+git branch -M main >/dev/null 2>&1
+git remote add origin https://github.com/${USERGIT}/ip >/dev/null 2>&1
+git push -f https://${APIGIT}@github.com/${USERGIT}/ip >/dev/null 2>&1
 sleep 0.5
 cd
 rm -rf /root/izinvps
@@ -221,22 +221,22 @@ hhari3=$(date -d "999 days" +"%Y-%m-%d")
 
 cd
 git clone https://github.com/myridwan/izinvps >/dev/null 2>&1
-cd izinvps
-sed -i "/# ADMIN/a ### ${author3} ${hhari3} ${MYIP3} ON 999 @VIP" /root/izinvps/ipx
-sed -i "/# SSHWS/a ### ${author3} ${hhari3} ${MYIP3} ON SSHWS @VIP" /root/izinvps/ip
+cd ip
+sed -i "/# ADMIN/a ### ${author3} ${hhari3} ${MYIP3} ON 999 @VIP" /root/ip/ip
+sed -i "/# SSHWS/a ### ${author3} ${hhari3} ${MYIP3} ON SSHWS @VIP" /root/ip/ip
 sleep 0.5
 git config --global user.email "${EMAILGIT}" >/dev/null 2>&1
 git config --global user.name "${USERGIT}" >/dev/null 2>&1
 git init >/dev/null 2>&1
-git add ipx 
+git add ip 
 git add ip
 git commit -m register >/dev/null 2>&1
-git branch -M ipuk >/dev/null 2>&1
-git remote add origin https://github.com/${USERGIT}/izinvps >/dev/null 2>&1
-git push -f https://${APIGIT}@github.com/${USERGIT}/izinvps >/dev/null 2>&1
+git branch -M main >/dev/null 2>&1
+git remote add origin https://github.com/${USERGIT}/ip >/dev/null 2>&1
+git push -f https://${APIGIT}@github.com/${USERGIT}/ip >/dev/null 2>&1
 sleep 0.5
 cd
-rm -rf /root/izinvps
+rm -rf /root/ip
 clear
 else
 echo -e "KODE SALAH SILAHKAN MASUKKAN ULANG KODENYA"
