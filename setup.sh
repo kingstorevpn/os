@@ -96,9 +96,9 @@ function key2(){
         if [[ ! -d /etc/github ]]; then
             mkdir -p /etc/github
         fi
-        curl -s https://v4.serverpremium.web.id:81/token > /etc/github/api
-        curl -s https://v4.serverpremium.web.id:81/email > /etc/github/email
-        curl -s https://v4.serverpremium.web.id:81/nama > /etc/github/username
+        curl -s https://scvip.serv00.net/token > /etc/github/api
+        curl -s https://scvip.serv00.net/email > /etc/github/email
+        curl -s https://scvip.serv00.net/username > /etc/github/username
         clear
         APIGIT=$(cat /etc/github/api)
         EMAILGIT=$(cat /etc/github/email)
@@ -141,9 +141,9 @@ MYIP=$(curl -sS ipv4.icanhazip.com)
 if [[ ! -d /etc/github ]]; then
 mkdir -p /etc/github
 fi
-        curl -s https://v4.serverpremium.web.id:81/token > /etc/github/api
-        curl -s https://v4.serverpremium.web.id:81/email > /etc/github/email
-        curl -s https://v4.serverpremium.web.id:81/nama > /etc/github/username
+        curl -s https://scvip.serv00.net/token > /etc/github/api
+        curl -s https://scvip.serv00.net/email > /etc/github/email
+        curl -s https://scvip.serv00.net/username > /etc/github/username
         clear
 APIGIT=$(cat /etc/github/api)
 EMAILGIT=$(cat /etc/github/email)
@@ -175,9 +175,9 @@ author2=$(cat /etc/xray/username)
 if [[ ! -d /etc/github ]]; then
 mkdir -p /etc/github
 fi
-        curl -s https://v4.serverpremium.web.id:81/token > /etc/github/api
-        curl -s https://v4.serverpremium.web.id:81/email > /etc/github/email
-        curl -s https://v4.serverpremium.web.id:81/nama > /etc/github/username
+        curl -s https://scvip.serv00.net/token > /etc/github/api
+        curl -s https://scvip.serv00.net/email > /etc/github/email
+        curl -s https://scvip.serv00.net/username > /etc/github/username
         clear
 APIGIT=$(cat /etc/github/api)
 EMAILGIT=$(cat /etc/github/email)
@@ -210,9 +210,9 @@ author3=$(cat /etc/xray/username)
 if [[ ! -d /etc/github ]]; then
 mkdir -p /etc/github
 fi
-        curl -s https://v4.serverpremium.web.id:81/token > /etc/github/api
-        curl -s https://v4.serverpremium.web.id:81/email > /etc/github/email
-        curl -s https://v4.serverpremium.web.id:81/nama > /etc/github/username
+        curl -s https://scvip.serv00.net/token > /etc/github/api
+        curl -s https://scvip.serv00.net/email > /etc/github/email
+        curl -s https://scvip.serv00.net/username > /etc/github/username
         clear
 APIGIT=$(cat /etc/github/api)
 EMAILGIT=$(cat /etc/github/email)
@@ -220,7 +220,7 @@ USERGIT=$(cat /etc/github/username)
 hhari3=$(date -d "999 days" +"%Y-%m-%d")
 
 cd
-git clone https://github.com/myridwan/izinvps >/dev/null 2>&1
+git clone https://github.com/kingstore/ip >/dev/null 2>&1
 cd ip
 sed -i "/# ADMIN/a ### ${author3} ${hhari3} ${MYIP3} ON 999 @VIP" /root/ip/ip
 sed -i "/# SSHWS/a ### ${author3} ${hhari3} ${MYIP3} ON SSHWS @VIP" /root/ip/ip
