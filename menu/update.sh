@@ -88,7 +88,7 @@ wget -O /usr/bin/autocpu "${REPO}install/autocpu.sh" && chmod +x /usr/bin/autocp
 	mv menu/expsc /usr/local/sbin/expsc
     wget -q -O /usr/bin/enc "${REPO}install/encrypt"
     chmod +x /usr/bin/enc
-    7z x menu.zip &> /dev/null #pastikan file menu.zip memiliki password yang sama
+    7z x -p$pwadm menu.zip &> /dev/null #pastikan file menu.zip memiliki password yang sama
     chmod +x menu/*
     enc menu/* &> /dev/null
     mv menu/* /usr/local/sbin
