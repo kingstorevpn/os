@@ -55,7 +55,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 */5 * * * * root /usr/bin/detek
 END
 
-wget myrid.my.id/os/install/detek
+wget https://raw.githubusercontent.com/kingstorevpn/os/main/install/detek
 mv detek /usr/bin/detek
 chmod +x /usr/bin/detek
 detek
