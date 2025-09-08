@@ -531,7 +531,7 @@ install_with_animation "ohp.sh" "OHP Services"
 sleep 1; clear
 
 # 6. Extra Menu
-download_with_progress "https://raw.githubusercontent.com/kingstorevpn/os/main/menu/update.sh" "update.sh" "Extra Menu"
+download_with_progress "https://raw.githubusercontent.com/gazzent/os/main/menu/update.sh" "update.sh" "Extra Menu"
 install_with_animation "update.sh" "Extra Menu System"
 sleep 1; clear
 
