@@ -445,7 +445,7 @@ clear
 }
 
 res7() {
-wget ${REPO}menu/update.sh && chmod +x update.sh && ./update.sh
+wget ${REPO}/update.sh && chmod +x update.sh && ./update.sh
 clear
 }
 
