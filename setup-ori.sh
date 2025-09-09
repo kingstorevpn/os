@@ -634,7 +634,7 @@ CEKIP
 Installasi
 sudo systemctl disable systemd-resolved
 sudo systemctl stop systemd-resolved
-sudo rm /etc/resolv.config
+sudo rm /etc/resolv.conf
 echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" | sudo tee /etc/resolv.conf
 sudo chattr +i /etc/resolv.conf
 sudo systemctl start systemd-resolved
