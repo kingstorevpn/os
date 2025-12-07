@@ -173,7 +173,7 @@ ok "badvpn services configured"
 info "Configuring SSH ports & authentication..."
 SSH_CONF='/etc/ssh/sshd_config'
 
-# enable password auth
+# enable password auth (awal)
 sed -i 's/^#\?PasswordAuthentication .*/PasswordAuthentication yes/' "$SSH_CONF" || true
 
 # remove existing Port lines and add desired ports (idempotent)
@@ -200,6 +200,38 @@ grep -Fxq "/bin/false" /etc/shells || echo "/bin/false" >> /etc/shells
 grep -Fxq "/usr/sbin/nologin" /etc/shells || echo "/usr/sbin/nologin" >> /etc/shells
 systemctl restart dropbear >/dev/null 2>&1 || warn "dropbear restart failed"
 ok "Dropbear setup complete"
+
+# ---------------------------
+# ✅ FIX: pastikan OpenSSH tetap utama & password login jalan
+# ---------------------------
+info "Ensuring OpenSSH remains primary & password logins are allowed..."
+
+# Pastikan PasswordAuthentication YES
+if grep -q "^#\?PasswordAuthentication" "$SSH_CONF"; then
+  sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' "$SSH_CONF" || true
+else
+  echo "PasswordAuthentication yes" >> "$SSH_CONF"
+fi
+
+# Izinkan root login (kalau kamu pakai root di Termius)
+if grep -q "^#\?PermitRootLogin" "$SSH_CONF"; then
+  sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' "$SSH_CONF" || true
+else
+  echo "PermitRootLogin yes" >> "$SSH_CONF"
+fi
+
+# Hapus aturan AuthenticationMethods kalau ada (kadang bikin key-only)
+sed -i '/^AuthenticationMethods/d' "$SSH_CONF" || true
+
+# Pastikan port 22 tetap ada
+if ! grep -q "^Port 22" "$SSH_CONF"; then
+  echo "Port 22" >> "$SSH_CONF"
+fi
+
+# Aktifkan dan restart SSH
+systemctl enable ssh >/dev/null 2>&1 || true
+systemctl restart ssh >/dev/null 2>&1 || warn "ssh restart failed"
+ok "OpenSSH password authentication ensured"
 
 # ---------------------------
 # 8) Squid proxy
@@ -415,4 +447,3 @@ echo -e "  - Web root: ${YELLOW}/home/vps/public_html${NC}"
 echo
 echo -e "${YELLOW}Tip:${NC} Check services with 'systemctl status haproxy nginx xray vnstat' and logs in /var/log/"
 echo
-
