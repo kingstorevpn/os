@@ -1,7 +1,7 @@
 #!/bin/bash
 # ╔══════════════════════════════════════════════════════════════════╗
-# ║   ⛓️  -NETWORK :: SYSTEM BOOTSTRAP & OPTIMIZE (Safety Mode)  ║
-# ║    With config backup & safe SSH password authentication         ║
+# ║   ⛓️  -NETWORK :: SYSTEM BOOTSTRAP & OPTIMIZE (Next-Gen)     ║
+# ║    Installs: core tools, web, vpn, haproxy, vnstat, badvpn, bbr  ║
 # ╚══════════════════════════════════════════════════════════════════╝
 set -o errexit
 set -o nounset
@@ -46,91 +46,13 @@ else
   err "Cannot detect OS. Exiting."
 fi
 
-# =======================================================
-# 🛟 SAFETY MODE: BACKUP KONFIGURASI SEBELUM DIUTAK-ATIK
-# =======================================================
-BACKUP_DIR="/root/backup-ssh-vpn-$(date +%Y%m%d-%H%M%S)"
-mkdir -p "$BACKUP_DIR"
-
-backup_file() {
-  local f="$1"
-  if [[ -f "$f" ]]; then
-    local dest="$BACKUP_DIR$(echo "$f" | sed 's#/#_#g')"
-    cp -p "$f" "$dest"
-    info "Backup $f -> $dest"
-  fi
-}
-
-info "Creating safety backup in: $BACKUP_DIR"
-
-# Backup file-file penting
-backup_file /etc/ssh/sshd_config
-backup_file /etc/default/dropbear
-backup_file /etc/nginx/nginx.conf
-backup_file /etc/nginx/conf.d/vps.conf
-backup_file /etc/nginx/conf.d/xray.conf
-backup_file /etc/haproxy/haproxy.cfg
-backup_file /etc/squid/squid.conf
-backup_file /etc/vnstat.conf
-backup_file /etc/rc.local
-backup_file /etc/iptables.up.rules
-backup_file /etc/issue.net
-
-# Simpan list service aktif (opsional, buat referensi)
-systemctl list-units --type=service --state=running > "$BACKUP_DIR/_running-services.txt" 2>/dev/null || true
-ss -tulpn > "$BACKUP_DIR/_listening-ports.txt" 2>/dev/null || true
-
-# Buat script restore otomatis
-RESTORE_SCRIPT="$BACKUP_DIR/RESTORE.sh"
-cat > "$RESTORE_SCRIPT" <<EOF
-#!/bin/bash
-echo "⚠️  RESTORE MODE: Mengembalikan config lama dari backup: $BACKUP_DIR"
-echo "Tekan CTRL+C jika belum yakin."
-sleep 3
-
-restore_file() {
-  local backup_name="\$1"
-  local target="\$2"
-  if [[ -f "\$backup_name" ]]; then
-    echo "[RESTORE] \$backup_name -> \$target"
-    cp -f "\$backup_name" "\$target"
-  fi
-}
-
-restore_file "$BACKUP_DIR/etc_ssh_sshd_config" /etc/ssh/sshd_config
-restore_file "$BACKUP_DIR/etc_default_dropbear" /etc/default/dropbear
-restore_file "$BACKUP_DIR/etc_nginx_nginx.conf" /etc/nginx/nginx.conf
-restore_file "$BACKUP_DIR/etc_nginx_conf.d_vps.conf" /etc/nginx/conf.d/vps.conf
-restore_file "$BACKUP_DIR/etc_nginx_conf.d_xray.conf" /etc/nginx/conf.d/xray.conf
-restore_file "$BACKUP_DIR/etc_haproxy_haproxy.cfg" /etc/haproxy/haproxy.cfg
-restore_file "$BACKUP_DIR/etc_squid_squid.conf" /etc/squid/squid.conf
-restore_file "$BACKUP_DIR/etc_vnstat.conf" /etc/vnstat.conf
-restore_file "$BACKUP_DIR/etc_rc.local" /etc/rc.local
-restore_file "$BACKUP_DIR/etc_iptables.up.rules" /etc/iptables.up.rules
-restore_file "$BACKUP_DIR/etc_issue.net" /etc/issue.net
-
-echo "Restarting core services..."
-systemctl daemon-reload || true
-systemctl restart ssh 2>/dev/null || systemctl restart sshd 2>/dev/null || true
-systemctl restart dropbear 2>/dev/null || true
-systemctl restart nginx 2>/dev/null || true
-systemctl restart haproxy 2>/dev/null || true
-systemctl restart squid 2>/dev/null || true
-systemctl restart vnstat 2>/dev/null || true
-
-echo "✅ Restore selesai. Silakan cek service dan koneksi SSH."
-EOF
-chmod +x "$RESTORE_SCRIPT"
-ok "Safety backup created. To restore later, run: bash $RESTORE_SCRIPT"
-
 # ---------------------------
 # 0) Quick header
 # ---------------------------
 clear
 echo -e "${BLUE}╔════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BLUE}║${NC}   ⛓️  -NETWORK :: Bootstrap & Optimization (Safety)      ${BLUE}║${NC}"
+echo -e "${BLUE}║${NC}   ⛓️  -NETWORK :: Bootstrap & Optimization (Next-Gen)    ${BLUE}║${NC}"
 echo -e "${BLUE}╚════════════════════════════════════════════════════════════════╝${NC}"
-echo -e "Backup dir: ${YELLOW}$BACKUP_DIR${NC}"
 echo
 
 # ---------------------------
@@ -280,28 +202,33 @@ systemctl restart dropbear >/dev/null 2>&1 || warn "dropbear restart failed"
 ok "Dropbear setup complete"
 
 # ---------------------------
-# ✅ FIX: OpenSSH tetap utama & password login ON
+# ✅ FIX: pastikan OpenSSH tetap utama & password login jalan
 # ---------------------------
 info "Ensuring OpenSSH remains primary & password logins are allowed..."
 
+# Pastikan PasswordAuthentication YES
 if grep -q "^#\?PasswordAuthentication" "$SSH_CONF"; then
   sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' "$SSH_CONF" || true
 else
   echo "PasswordAuthentication yes" >> "$SSH_CONF"
 fi
 
+# Izinkan root login (kalau kamu pakai root di Termius)
 if grep -q "^#\?PermitRootLogin" "$SSH_CONF"; then
   sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' "$SSH_CONF" || true
 else
   echo "PermitRootLogin yes" >> "$SSH_CONF"
 fi
 
+# Hapus aturan AuthenticationMethods kalau ada (kadang bikin key-only)
 sed -i '/^AuthenticationMethods/d' "$SSH_CONF" || true
 
+# Pastikan port 22 tetap ada
 if ! grep -q "^Port 22" "$SSH_CONF"; then
   echo "Port 22" >> "$SSH_CONF"
 fi
 
+# Aktifkan dan restart SSH
 systemctl enable ssh >/dev/null 2>&1 || true
 systemctl restart ssh >/dev/null 2>&1 || warn "ssh restart failed"
 ok "OpenSSH password authentication ensured"
@@ -337,6 +264,7 @@ make install >/dev/null 2>&1 || true
 cd
 rm -rf vnstat-2.6 vnstat-2.6.tar.gz || true
 
+# register interface
 vnstat -u -i "$NET_IFACE" >/dev/null 2>&1 || true
 sed -i "s@Interface \"eth0\"@Interface \"${NET_IFACE}\"@g" /etc/vnstat.conf || true
 chown -R vnstat:vnstat /var/lib/vnstat || true
@@ -408,6 +336,7 @@ ok "DOS-Deflate installed (if resources available)"
 # ---------------------------
 info "Updating /etc/issue.net and rsyslog..."
 wget -q -O /etc/issue.net "${REPO}install/issue.net" || true
+# remote rsyslog config if provided:
 if wget -q -O /root/setrsyslog.sh "${REPO}install/setrsyslog.sh"; then
   chmod +x /root/setrsyslog.sh && bash /root/setrsyslog.sh || warn "setrsyslog script failed"
 fi
@@ -430,6 +359,7 @@ if wget -q -O /root/ipserver "${REPO}install/ipserver"; then
   chmod +x /root/ipserver && /root/ipserver || true
 fi
 
+# torrent block patterns
 for pat in "get_peers" "announce_peer" "find_node" "BitTorrent" "BitTorrent protocol" "peer_id=" ".torrent" "announce.php?passkey=" "torrent" "announce" "info_hash"; do
   iptables -A FORWARD -m string --algo bm --string "$pat" -j DROP >/dev/null 2>&1 || true
 done
@@ -461,6 +391,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 */5 * * * * root /usr/bin/autocpu
 EOF
 
+# autocpu helper
 wget -q -O /usr/bin/autocpu "${REPO}install/autocpu.sh" && chmod +x /usr/bin/autocpu || true
 
 cat > /etc/cron.d/xp_sc <<'EOF'
@@ -498,14 +429,15 @@ apt autoremove -y >/dev/null 2>&1 || true
 
 chown -R www-data:www-data /home/vps/public_html || true
 
+# remove installer leftovers if present
 rm -f /root/key.pem /root/cert.pem /root/ssh-vpn.sh /root/bbr.sh 2>/dev/null || true
 rm -rf /etc/apache2 2>/dev/null || true
 
 clear
 echo
 echo -e "${GREEN}╔════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║ ✅  -NETWORK Bootstrap (Safety Mode) Completed            ║${NC}"
-echo -e "${GREEN}║ ✅  Backup dir: $BACKUP_DIR                                ║${NC}"
+echo -e "${GREEN}║ ✅  -NETWORK Bootstrap Completed                         ║${NC}"
+echo -e "${GREEN}║ ✅  Reboot recommended for kernel tweaks & swap activation    ║${NC}"
 echo -e "${GREEN}╚════════════════════════════════════════════════════════════════╝${NC}"
 echo
 echo -e "${CYAN}Summary:${NC}"
@@ -513,5 +445,5 @@ echo -e "  - IP: ${YELLOW}${MYIP}${NC}"
 echo -e "  - Interface: ${YELLOW}${NET_IFACE}${NC}"
 echo -e "  - Web root: ${YELLOW}/home/vps/public_html${NC}"
 echo
-echo -e "${YELLOW}Tip:${NC} To restore old configs:  ${GREEN}bash $BACKUP_DIR/RESTORE.sh${NC}"
+echo -e "${YELLOW}Tip:${NC} Check services with 'systemctl status haproxy nginx xray vnstat' and logs in /var/log/"
 echo
